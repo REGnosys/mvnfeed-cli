@@ -217,6 +217,11 @@ def _java_artifacts(artifact_fullname, artifact_type, artifact_path, transfer_de
             'target': False
         },
         {
+            'name': artifact_fullname + '-sources.jar.sha1',
+            'path': artifact_path,
+            'target': False
+        },
+        {
             'name': artifact_fullname + '-javadoc.jar',
             'path': artifact_path,
             'target': False
