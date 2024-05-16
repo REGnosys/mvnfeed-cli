@@ -113,7 +113,7 @@ def _transfer_single_artifact(name, from_repository, to_repository, stage_dir, t
 
         # let's always download POM files in case we need to process the parent POM
         # once again or upload the children dependencies.
-        outfile = os.path.join(stage_dir, file2transfer['name'])
+        outfile = os.path.join(stage_dir, group_id + '-' + file2transfer['name'])
         _download_file(from_repository, artifact_relativepath, outfile)
         if not os.path.exists(outfile):
             logging.info('%s was not downloaded. Skipping', outfile)
