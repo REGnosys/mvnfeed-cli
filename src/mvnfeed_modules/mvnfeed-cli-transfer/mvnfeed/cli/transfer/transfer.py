@@ -2,18 +2,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-
+import functools
 import logging
 import os.path
 import requests
 import shutil
 import xml.etree.ElementTree as ET
-try:
-    # Python 3
-    from urllib.request import Request, urlopen
-except ImportError:
-    # Python 2
-    from urllib2 import Request, urlopen
 from .configuration import get_repository, get_stagedir, get_repository_shortname
 from mvnfeed.cli.common.config import AUTHORIZATION, URL, load_config
 
@@ -259,7 +253,7 @@ def _findNodeValue(node, name):
     return foundNode.text
 
 
-def _download_file(from_repository, path, filename, length=16*1024):
+def _download_file(from_repository, path, filename):
     """
     Stores the path into the given filename.
     """
@@ -271,20 +265,20 @@ def _download_file(from_repository, path, filename, length=16*1024):
 
     url = _append_url(from_repository[URL], path)
     logging.debug('downloading from %s', url)
-    try:
-        request = Request(url)
-        if AUTHORIZATION in from_repository and from_repository[AUTHORIZATION]:
-            logging.debug('authorization header added')
-            request.add_header('Authorization', from_repository[AUTHORIZATION])
-        else:
-            logging.debug('no authorization configured')
+    if AUTHORIZATION in from_repository and from_repository[AUTHORIZATION]:
+        logging.debug('authorization header added')
+        headers = {'Authorization': from_repository[AUTHORIZATION]}
+    else:
+        logging.debug('no authorization configured')
+        headers = {}
 
-        response = urlopen(request)
-        with open(filename, 'wb') as file:
-            shutil.copyfileobj(response, file, length)
+    try:
+        with requests.get(url, headers=headers, stream=True) as response:
+            response.raw.read = functools.partial(response.raw.read, decode_content=True)
+            with open(filename, 'wb') as file:
+                shutil.copyfileobj(response.raw, file)
     except Exception as ex:
         logging.debug('exception while downloading (expected): %s', ex)
-        None
 
 
 def _already_uploaded(to_repository, path):
