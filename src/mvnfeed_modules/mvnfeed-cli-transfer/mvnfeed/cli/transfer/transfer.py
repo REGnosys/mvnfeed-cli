@@ -279,11 +279,14 @@ def _download_file(from_repository, path, filename):
 
     try:
         with requests.get(url, headers=headers, stream=True) as response:
+            if not response.ok:
+                logging.debug('exception while downloading (expected): %s', response.text)
+                return
             response.raw.read = functools.partial(response.raw.read, decode_content=True)
             with open(filename, 'wb') as file:
                 shutil.copyfileobj(response.raw, file)
     except Exception as ex:
-        logging.debug('exception while downloading (expected): %s', ex)
+        logging.error('exception while downloading: %s', ex)
 
 
 def _already_uploaded(to_repository, path):
