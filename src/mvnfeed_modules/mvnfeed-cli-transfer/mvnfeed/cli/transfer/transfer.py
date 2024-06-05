@@ -225,6 +225,17 @@ def _java_artifacts(artifact_fullname, artifact_type, artifact_path, transfer_de
             'name': artifact_fullname + '-javadoc.jar',
             'path': artifact_path,
             'target': False
+        },
+        {
+            'name': artifact_fullname + '.zip',
+            'path': artifact_path,
+            'transfer_deps': transfer_deps,
+            'target': False
+        },
+        {
+            'name': artifact_fullname + '.zip.sha1',
+            'path': artifact_path,
+            'target': False
         }
     ]
 
@@ -263,7 +274,8 @@ def _download_file(from_repository, path, filename):
     Stores the path into the given filename.
     """
     if os.path.exists(filename):
-        logging.debug('%s already downloaded', filename)
+        logging.info('already downloaded, skipping %s', filename)
+        return
 
     if URL not in from_repository or not from_repository[URL]:
         raise ValueError('Repository missing url: ' + get_repository_shortname(from_repository))
