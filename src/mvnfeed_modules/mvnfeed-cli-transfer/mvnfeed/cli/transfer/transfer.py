@@ -236,6 +236,17 @@ def _java_artifacts(artifact_fullname, artifact_type, artifact_path, transfer_de
             'name': artifact_fullname + '.zip.sha1',
             'path': artifact_path,
             'target': False
+        },
+        {
+            'name': artifact_fullname + '.tar.gz',
+            'path': artifact_path,
+            'transfer_deps': transfer_deps,
+            'target': False
+        },
+        {
+            'name': artifact_fullname + '.tar.gz.sha1',
+            'path': artifact_path,
+            'target': False
         }
     ]
 
